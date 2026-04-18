@@ -1,0 +1,51 @@
+library(tidyverse)
+library(ineq)       
+library(factoextra) 
+
+
+df_raw <- read_delim(
+  "boost_1.csv",
+  delim = ";",
+  locale = locale(encoding = "windows-1251")
+)
+
+library(tidyverse)
+
+regions <- c("м. Київ","Дніпропетровська обл.","Харківська обл.","Львівська обл.",
+             "Одеська обл.","Київська обл.","Донецька обл.","Запорізька обл.",
+             "Полтавська обл.","Вінницька обл.","Житомирська обл.","Хмельницька обл.",
+             "Черкаська обл.","Миколаївська обл.","Закарпатська обл.","Івано-Франківська обл.",
+             "Рівненська обл.","Волинська обл.","Сумська обл.","Кіровоградська обл.",
+             "Тернопільська обл.","Чернігівська обл.","Чернівецька обл.","Херсонська обл.",
+             "Луганська обл.")
+
+df <- tibble(
+  region = rep(regions, 2),
+  year   = c(rep("2021", 25), rep("2024", 25)),
+  amount = c(
+    69.4, 60.0, 45.5, 35.7, 34.4, 32.3, 33.4, 25.0, 23.9, 20.9,
+    16.3, 17.6, 15.9, 15.3, 15.0, 16.8, 15.6, 13.9, 14.2, 13.4,
+    13.4, 13.4, 10.6, 13.9, 11.4,
+    96.2, 70.2, 43.8, 47.6, 42.4, 45.6, 22.7, 25.2, 28.5, 26.8,
+    21.5, 20.9, 21.1, 20.5, 19.3, 20.6, 19.3, 18.2, 16.2, 16.1,
+    15.2, 17.1, 13.3,  9.4,  3.5
+  )
+) %>%
+  mutate(region = fct_reorder(region, amount, .fun = max))
+
+ggplot(df, aes(x = amount, y = region, fill = year)) +
+  geom_col(position = position_dodge(width = 0.7), width = 0.6) +
+  scale_fill_manual(values = c("2021" = "#378ADD", "2024" = "#1D9E75")) +
+  labs(
+    title    = "Видатки місцевих бюджетів по областях",
+    subtitle = "2021 vs 2024, млрд грн",
+    x = "млрд грн",
+    y = NULL,
+    fill = NULL
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    legend.position    = "top",
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor   = element_blank()
+  )

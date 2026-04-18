@@ -1,0 +1,51 @@
+library(dplyr)
+library(ggplot2)
+options(scipen=999)
+
+file_path <- "EXP-KPK-NAT-2026-1-2.csv"
+
+data <- read.csv(file_path, sep = ";", stringsAsFactors = FALSE, fileEncoding = "Windows-1251")
+data <- data[-1, ]
+data <- data %>% filter(код != "0000")
+
+data$уточнений.річний.план <- as.numeric(data$уточнений.річний.план)
+
+top_20_data <- data %>%
+  arrange(desc(уточнений.річний.план)) %>%
+  head(20)
+
+ggplot(top_20_data, aes(x = reorder(найменування.коду, уточнений.річний.план), y = уточнений.річний.план)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  coord_flip() +
+  labs(
+    title = "Топ-10 програм за обсягом уточненого річного плану",
+    subtitle = "Дані з бази видатків державного бюджету",
+    x = "Найменування програми",
+    y = "Уточнений річний план (грн)"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.y = element_text(size = 8),
+    plot.title = element_text(face = "bold", size = 14)
+  )
+
+mod_data <- data %>%
+  filter(grepl("^21", код)) %>% 
+  filter(код != "2100000") %>% 
+  arrange(desc(уточнений.річний.план)) %>%
+  head(5)
+
+ggplot(mod_data, aes(x = reorder(найменування.коду, уточнений.річний.план), y = уточнений.річний.план)) +
+  geom_bar(stat = "identity", fill = "#4A7c59") +
+  coord_flip() +
+  labs(
+    title = "Топ-5 статей видатків Міністерства оборони України",
+    subtitle = "За обсягом уточненого річного плану",
+    x = "Найменування програми",
+    y = "Уточнений річний план (грн)"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.y = element_text(size = 8),
+    plot.title = element_text(face = "bold", size = 13)
+  )
